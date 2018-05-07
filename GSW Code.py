@@ -47,7 +47,10 @@ def room1_lux():
     room 1
     """
     lux_value_room1 = l3_input # l3 = reading from input 1 on RPi.GPIO (TBC)
-    return lux_value_room1
+    if lux_value_room1 >= 100: # Preset Light value TBA
+        return True # Lights are ON
+    else:
+        return False # Lights are off
 
 def room2_lux():
     """Room 2 Light sensor: L4
@@ -58,6 +61,10 @@ def room2_lux():
     room 2
     """
     lux_value_room2 = l4_input # l4 = reading from input 2 on RPi.GPIO
+    if lux_value_room2 >= 100: # Preset Light value TBA
+        return True # Lights are ON
+    else:
+        return False # Lights are off
     return lux_value_room2   
 
 def moisture_subject1():
@@ -205,14 +212,17 @@ def room2_co2():
 
 def reservoir1_upper_level():
     """Upper Level Reading for: Reservoir 1
-      (input GPIO) -> float
+      (input GPIO) -> bool
     Reference: Sensor 16
     
     Returns a float with the reading from the W1 input for the upper level 
     reading of reservoir 1
     """
-    upper_lev_res1 = w1_input # w1 = reading from input 16 on RPi.GPIO
-    return upper_lev_res1
+    upper_levr1 = w1_input # w1 = reading from input 16 on RPi.GPIO
+    if upper_levr1 >= 100: # Preset level TBA
+        return True # Has reached set value stop filling
+    else:
+        return False # Empty still filling
 
 def reservoir1_lower_level():
     """Lower Level Reading for: Reservoir 1
@@ -222,9 +232,12 @@ def reservoir1_lower_level():
     Returns a float with the reading from the W2 input for the lower level 
     reading of reservoir 1
     """
-    lower_lev_res1 = w2_input # w2 = reading from input 17 on RPi.GPIO
-    return lower_lev_res1
-
+    lower_levr1 = w2_input # w2 = reading from input 17 on RPi.GPIO
+    if lower_levr1 < 20: # Preset Level TBA
+        return True # Res is empty and needs filled
+    else:
+        return False # Res has water and does not need filled
+    
 def reservoir2_upper_level():
     """Upper Level Reading for: Reservoir 2
       (input GPIO) -> float
@@ -233,8 +246,11 @@ def reservoir2_upper_level():
     Returns a float with the reading from the W3 input for the upper level 
     reading of reservoir 2
     """
-    upper_lev_res2 = w3_input # w3 = reading from input 18 on RPi.GPIO
-    return upper_lev_res2
+    upper_levr2 = w3_input # w3 = reading from input 18 on RPi.GPIO
+    if upper_levr2 >= 100: # Preset level TBA
+        return True # Has reached set value stop filling
+    else:
+        return False # Empty still filling    
 
 def reservoir2_lower_level():
     """Lower Level Reading for: Reservoir 2
@@ -244,8 +260,11 @@ def reservoir2_lower_level():
     Returns a float with the reading from the W4 input for the lower level 
     reading of reservoir 2
     """
-    lower_lev_res2 = w4_input # w4 = reading from input 19 on RPi.GPIO
-    return lower_lev_res2
+    lower_levr2 = w4_input # w4 = reading from input 19 on RPi.GPIO
+    if lower_levr2 < 20: # Preset Level TBA
+        return True # Res is empty and needs filled
+    else:
+        return False # Res has water and does not need filled
 
 def reservoir1_ph():
     """pH reading for: Reservoir 1
@@ -529,11 +548,11 @@ def bubbler(status):
         
 """The below code is for helper functions for the main programme to run"""
 
-def initial_time():
+def initial_time(file):
     """Function to read the data from the time_stamp file to find the initial
     time stamp the GSW started on
     Returns in form of int in a list"""
-    infile = open('time_stamp.txt')
+    infile = open(file)
     lines = infile.readlines()
     data1 = []
     for line in lines:
@@ -546,9 +565,9 @@ def initial_time():
     return final
 
 
-def time_write_to_file():
+def time_write_to_file(file, write_mode):
     """Function To collect data for the GSW Project and write to text file"""
-    outfile = open('time_stamp.txt', 'a')
+    outfile = open(file, write_mode)
     new_data = time.localtime(time.time())
     for data in new_data:
         outfile.write(str(data) + ' ')
@@ -557,7 +576,7 @@ def time_write_to_file():
  
 def days_since_start():
     """Returns the number of days since start day"""
-    initial = initial_time()
+    initial = initial_time('time_stamp.txt')
     actual = time.localtime(time.time())
     if initial[0] == actual[0]:
         return actual[7] - initial[7]
@@ -566,6 +585,15 @@ def days_since_start():
             return (366 - initial[7]) + actual[7]
         else:
             return (365 - initial[7]) + actual[7]
+        
+def mins_since_event(file):
+    """Returns the number of minutes since recorded event from text file."""
+    initial = initial_time(file)
+    actual = time.localtime(time.time())
+    if initial[3] == actual[3]:
+        return actual[4] - initial[4]
+    else:
+        return (60 - initial[4]) + actual[4]
     
 
 def timer_lights_on_off_room1():
@@ -648,6 +676,7 @@ def check_lighting_state_room2():
 def check_water_resivoirs():
     """Function to check the levels of water resivoirs and fill if required"""
     if reservoir1_lower_level():
+        time_write_to_file('res1empty.txt', 'w')
         while not reservoir1_upper_level():
             water_res1_fill(True)
             time.sleep(5)
@@ -656,7 +685,9 @@ def check_water_resivoirs():
             peris_pump_res1(False)
         else:
             water_res1_fill(False)
+            time_write_to_file('res1full.txt', 'w')
     elif reservoir2_lower_level():
+        time_write_to_file('res2empty.txt', 'w')
         while not reservoir2_upper_level():
             water_res2_fill(True)
             time.sleep(5)
@@ -665,12 +696,39 @@ def check_water_resivoirs():
             peris_pump_res1(False)
         else:
             water_res2_fill(False) 
+            time_write_to_file('res2full.txt', 'w')
 
-        
+def check_ph_level_res(num):
+    """Function to check the pH level of resivoir num (1 or 2), only test after 
+    30mins since the resivoir was filled."""
+    time_since_empty = mins_since_event('res' + str(num) + 'empty.txt')
+    time_since_test = mins_since_event('ph_test_res' + str(num) + '.txt')
+    time_since_fill = mins_since_event('res' + str(num) + 'full.txt')
+    if len(time_since_test) > 0:
+        if time_since_test >= 30 and time_since_fill < 110:
+            time_write_to_file('ph_test_res' + str(num) + '.txt', 'w')
+            ph_notify(reservoir1_ph(), num)
+        else:
+            pass
+    else:       
+        if time_since_empty >= 30:
+            time_write_to_file('ph_test_res' + str(num) + '.txt', 'w')
+            ph_notify(reservoir1_ph(), num)
+        else:
+            pass
+            
+    
+def ph_notify(reading, reservoir_num):
+    """Gets the reading from the pH levels in either reservoir 1 or 2 and 
+    notify of the result. Records to text file"""
+    
+    
+    
 """The below code is for the main programme to run and do its thing as provided
 by the description from the GSW wooksheet"""
 
 def main():
+    time_write_to_file('time_stamp.txt', 'a')
     system_ok = True
     master_water(True) # Turn Master Water Supply ON
     if not trip_sensor(): # Trip Sensor Intruder alert not active
@@ -681,6 +739,9 @@ def main():
         bubbler(True)
         """Check and Fill Water resivoirs"""
         check_water_resivoirs()
+        """Check pH levels of reservoirs"""
+        check_ph_level_res(1)
+        check_ph_level_res(2)
 
 
 
