@@ -64,8 +64,7 @@ def room2_lux():
     if lux_value_room2 >= 100: # Preset Light value TBA
         return True # Lights are ON
     else:
-        return False # Lights are off
-    return lux_value_room2   
+        return False # Lights are off  
 
 def moisture_subject1():
     """Moisture sensor for: Subject 1
@@ -75,8 +74,11 @@ def moisture_subject1():
     Returns a float with the reading from the M1 input moisture sensor for
     subject 1
     """
-    moist_value_sub1 = m1_input # m1 = reading from input 3 on RPi.GPIO
-    return moist_value_sub1
+    moisture_reading = m1_input # m1 = reading from input 3 on RPi.GPIO
+    if moisture_reading <= 100: # Preset moisture level
+        return True # Needs Moisture will get water
+    else:
+        return False # Moisture level fine   
     
 def moisture_subject2():
     """Moisture sensor for: Subject 2
@@ -86,8 +88,11 @@ def moisture_subject2():
     Returns a float with the reading from the M2 input moisture sensor for
     subject 2
     """
-    moist_value_sub2 = m2_input # m2 = reading from input 4 on RPi.GPIO
-    return moist_value_sub2
+    moisture_reading = m2_input # m2 = reading from input 4 on RPi.GPIO
+    if moisture_reading <= 100: # Preset moisture level
+        return True # Needs Moisture will get water
+    else:
+        return False # Moisture level fine     
 
 def moisture_subject3():
     """Moisture sensor for: Subject 3
@@ -97,8 +102,11 @@ def moisture_subject3():
     Returns a float with the reading from the M3 input moisture sensor for
     subject 3
     """
-    moist_value_sub3 = m3_input # m3 = reading from input 5 on RPi.GPIO
-    return moist_value_sub3
+    moisture_reading = m3_input # m3 = reading from input 5 on RPi.GPIO
+    if moisture_reading <= 100: # Preset moisture level
+        return True # Needs Moisture will get water
+    else:
+        return False # Moisture level fine     
 
 def moisture_subject4():
     """Moisture sensor for: Subject 4
@@ -108,8 +116,11 @@ def moisture_subject4():
     Returns a float with the reading from the M4 input moisture sensor for
     subject 4
     """
-    moist_value_sub4 = m4_input # m4 = reading from input 6 on RPi.GPIO
-    return moist_value_sub4
+    moisture_reading = m4_input # m4 = reading from input 6 on RPi.GPIO
+    if moisture_reading <= 100: # Preset moisture level
+        return True # Needs Moisture will get water
+    else:
+        return False # Moisture level fine     
 
 def moisture_subject5():
     """Moisture sensor for: Subject 5
@@ -119,8 +130,11 @@ def moisture_subject5():
     Returns a float with the reading from the M5 input moisture sensor for
     subject 5
     """
-    moist_value_sub5 = m5_input # m5 = reading from input 7 on RPi.GPIO
-    return moist_value_sub5
+    moisture_reading = m5_input # m5 = reading from input 7 on RPi.GPIO
+    if moisture_reading <= 100: # Preset moisture level
+        return True # Needs Moisture will get water
+    else:
+        return False # Moisture level fine     
 
 def moisture_subject6():
     """Moisture sensor for: Subject 6
@@ -130,8 +144,11 @@ def moisture_subject6():
     Returns a float with the reading from the M6 input moisture sensor for
     subject 6
     """
-    moist_value_sub6 = m6_input # m6 = reading from input 8 on RPi.GPIO
-    return moist_value_sub6
+    moisture_reading = m6_input # m6 = reading from input 8 on RPi.GPIO
+    if moisture_reading <= 100: # Preset moisture level
+        return True # Needs Moisture will get water
+    else:
+        return False # Moisture level fine     
 
 def room1_temp():
     """Temperature sensor for: Room 1
@@ -175,7 +192,10 @@ def room1_humidity():
     of room 1 
     """
     humidity_value1 = h1_input # h1 = reading from input 12 on RPi.GPIO
-    return humidity_value1
+    if humidity_value1 <= 100: # Preset Humidity setting
+        return True # Low Humidity turn ON mister
+    else:
+        return False # Humidity is fine
 
 def room2_humidity():
     """Humidity sensor for: Room 2
@@ -186,7 +206,10 @@ def room2_humidity():
     of room 2 
     """
     humidity_value2 = h2_input # h2 = reading from input 13 on RPi.GPIO
-    return humidity_value2
+    if humidity_value2 <= 100: # Preset Humidity setting
+        return True # Low Humidity turn ON mister
+    else:
+        return False # Humidity is fine    
 
 def room1_co2():
     """Carbon Dioxide sensor for: Room 1
@@ -197,7 +220,10 @@ def room1_co2():
     reading of room 1 (in PPM)
     """
     co2_value_room1 = o1_input # o1 = reading from input 14 on RPi.GPIO
-    return co2_value_room1
+    if co2_value_room1 <= 100: # Preset co2 setting
+        return True # Low co2 turn ON co2 tank
+    else:
+        return False # co2 is fine     
 
 def room2_co2():
     """Carbon Dioxide sensor for: Room 2
@@ -208,7 +234,10 @@ def room2_co2():
     reading of room 2 (in PPM)
     """
     co2_value_room2 = o2_input # o2 = reading from input 15 on RPi.GPIO
-    return co2_value_room2
+    if co2_value_room1 <= 100: # Preset co2 setting
+        return True # Low co2 turn ON co2 tank
+    else:
+        return False # co2 is fine    
 
 def reservoir1_upper_level():
     """Upper Level Reading for: Reservoir 1
@@ -485,7 +514,7 @@ def fan_speed_toogle(status):
     # Will need to confirm how this function will operate with the output of GPIO
     # and how it will change the motor speed.
         
-def fan_aux(status):
+def aux_fan(status):
     """Relay Control for: Aux Fan ON/OFF (Heat Venting)
       (bool) -> output GPIO 16
     Reference Output: Relay 5
@@ -555,15 +584,15 @@ def initial_time(file):
     infile = open(file)
     lines = infile.readlines()
     data1 = []
-    for line in lines:
-        data1.append(line.strip(' \n'))
-    infile.close()
-    initial = data1[0].split()
     final = []
-    for i in initial:
-        final.append(int(i))
+    if lines != []:
+        for line in lines:
+            data1.append(line.strip(' \n'))
+        infile.close()
+        initial = data1[0].split()
+        for i in initial:
+            final.append(int(i))
     return final
-
 
 def time_write_to_file(file, write_mode):
     """Function To collect data for the GSW Project and write to text file"""
@@ -572,7 +601,7 @@ def time_write_to_file(file, write_mode):
     for data in new_data:
         outfile.write(str(data) + ' ')
     outfile.write('\n')
-    outfile.close
+    outfile.close()
  
 def days_since_start():
     """Returns the number of days since start day"""
@@ -595,6 +624,22 @@ def mins_since_event(file):
     else:
         return (60 - initial[4]) + actual[4]
     
+def notification_to_file(filename, notification):
+    """Function to write a given notification to file with the time that it
+    occured for the log files"""
+    outfile = open(filename, 'a')
+    timestamp = time.localtime(time.time())
+    for data in timestamp:
+        outfile.write(str(data) + ' ') 
+    outfile.write(notification + '\n')
+    outfile.close()
+
+def remove_timestamp(file):
+    """Removes the timestamp from text file. Actually removes everything from
+    a text file"""
+    delete = open(file, 'w')
+    delete.write('')
+    delete.close()
 
 def timer_lights_on_off_room1():
     """The Function to set the time the lights are on this should take in 
@@ -721,8 +766,185 @@ def check_ph_level_res(num):
 def ph_notify(reading, reservoir_num):
     """Gets the reading from the pH levels in either reservoir 1 or 2 and 
     notify of the result. Records to text file"""
+    if reading >= 8:
+        _pH = 'The water in reservoir: ' + reservoir_num + ' is Basic! With a \
+        reading of: ' + reading + '\n'
+    elif reading <= 6:
+        _pH = 'The water in reservoir: ' + reservoir_num + ' is Acidic! With a \
+        reading of: ' + reading + '\n'       
+    else:
+        _pH = 'The water in reservoir: ' + reservoir_num + ' is Neutral! With \
+        a reading of: ' + reading + '\n'         
+    notification_to_file('ph_tests_logs.txt', _pH)
     
-    
+def read_moisture_subject_and_water(num):
+    """Reads to given moisture subject and waters subject if required. Keeps 
+    log for the results"""
+    if num == 1:
+        if moisture_subject1(): # True and needs watered
+            subject1_water(True) # Turn on water for subject 1
+            time.sleep(10) # Duration of watering in secs
+            subject1_water(False) # Turn off water
+            notification = 'Subject 1 just got watered.'
+            notification_to_file('moisture_and_water_logs.txt', notification)
+        else:
+            pass
+    elif num == 2:
+        if moisture_subject2(): # True and needs watered
+            subject2_water(True) # Turn on water for subject 2
+            time.sleep(10) # Duration of watering in secs
+            subject2_water(False) # Turn off water
+            notification = 'Subject 2 just got watered.'
+            notification_to_file('moisture_and_water_logs.txt', notification)
+        else:
+            pass   
+    elif num == 3:
+        if moisture_subject3(): # True and needs watered
+            subject3_water(True) # Turn on water for subject 3
+            time.sleep(10) # Duration of watering in secs
+            subject3_water(False) # Turn off water
+            notification = 'Subject 3 just got watered.'
+            notification_to_file('moisture_and_water_logs.txt', notification)
+        else:
+            pass
+    elif num == 4:
+        if moisture_subject4(): # True and needs watered
+            subject4_water(True) # Turn on water for subject 4
+            time.sleep(10) # Duration of watering in secs
+            subject4_water(False) # Turn off water
+            notification = 'Subject 4 just got watered.'
+            notification_to_file('moisture_and_water_logs.txt', notification)
+        else:
+            pass 
+    elif num == 5:
+        if moisture_subject5(): # True and needs watered
+            subject5_water(True) # Turn on water for subject 5
+            time.sleep(10) # Duration of watering in secs
+            subject5_water(False) # Turn off water
+            notification = 'Subject 5 just got watered.'
+            notification_to_file('moisture_and_water_logs.txt', notification)
+        else:
+            pass
+    if num == 6:
+        if moisture_subject6(): # True and needs watered
+            subject6_water(True) # Turn on water for subject 6
+            time.sleep(10) # Duration of watering in secs
+            subject6_water(False) # Turn off water
+            notification = 'Subject 6 just got watered.'
+            notification_to_file('moisture_and_water_logs.txt', notification)
+        else:
+            pass
+
+def temperature_and_fan_control():
+    """Function to control the temperature of the room to a 27degC target temp
+    Check this as there is two rooms and only one fan???
+    Have just programmed rooms as an or but may cause issues"""
+    temp_room_1 = room1_temp()
+    temp_room_2 = room2_temp()
+    outside_temp = intake_temp()
+    if temp_room_1 < 26 or temp_room_2 < 26:
+        fan_1(False) # Temp under 26 in either room turn fan OFF
+        aux_fan(False)
+        fan_speed_toogle(False)
+        remove_timestamp('emergency_temp_timestamp.txt')
+    elif temp_room_1 >= 26 and temp_room_1 < 28 or temp_room_2 >= 26 and \
+         temp_room_2 < 28:
+        fan_1(True) # Temp between 26 and 28 turn fan on speed 1
+        aux_fan(False)
+        fan_speed_toogle(False)
+        remove_timestamp('emergency_temp_timestamp.txt')
+    elif temp_room_1 >= 28 and temp_room_1 < 30 or temp_room_2 >= 28 and\
+         temp_room_2 < 30:
+        fan_speed_toogle(True) # Temp over 28 increase fan speed
+        remove_timestamp('emergency_temp_timestamp.txt')
+    elif temp_room_1 >= 30 or temp_room_2 >= 30:
+        if len(initial_time('emergency_temp_timestamp.txt')) == 0:
+            time_write_to_file('emergency_temp_timestamp.txt', 'w')
+        else:
+            if mins_since_event('emergency_temp_timestamp.txt') > 5:
+                aux_fan(True) # Temp been over 30 for 5mins aux_fan ON
+                fan_speed_toogle(True)
+                
+def check_room_humidity():
+    """Function to control the humidity of both rooms. If humidity low turn on
+    gizmo misters if it has been more than 5 mins since last activation""" 
+    if room1_humidity() or room2_humidity(): # Low Humidity needs a mist
+        if len(initial_time('humidity_timestamp.txt')) == 0:
+            time_write_to_file('humidity_timestamp.txt', 'w')  
+            water_misting(True) # Turn ON water mister
+            time.sleep(5) # Hold ON for 5 secs
+            water_misting(False) # Turn OFF water mister
+        else:
+            if mins_since_event('humidity_timestamp.txt') > 5:
+                water_misting(True) # Turn ON water mister
+                time.sleep(5) # Hold ON for 5 secs
+                water_misting(False) # Turn OFF water mister
+                time_write_to_file('humidity_timestamp.txt', 'w')
+    else:
+        remove_timestamp('humidity_timestamp.txt')
+            
+def check_room_co2(num):
+    """Function to check the co2 levels in either room and adjust the level to 
+    suit"""
+    if num == 1:
+        if room1_co2(): # Low Humidity needs a mist
+            if len(initial_time('co2_room1_timestamp.txt')) == 0:
+                time_write_to_file('co2_room1_timestamp.txt', 'w')  
+                add_co2_room1(True) # Turn ON co2
+                time.sleep(5) # Hold ON for 5 secs
+                add_co2_room1(False) # Turn OFF co2
+            else:
+                if mins_since_event('co2_room1_timestamp.txt') > 5:
+                    add_co2_room1(True) # Turn ON co2
+                    time.sleep(5) # Hold ON for 5 secs
+                    add_co2_room1(False) # Turn OFF co2
+                    time_write_to_file('co2_room1_timestamp.txt', 'w')
+        else:
+            remove_timestamp('co2_room1_timestamp.txt')   
+    elif num == 2:
+        if room2_co2(): # Low Humidity needs a mist
+            if len(initial_time('co2_room2_timestamp.txt')) == 0:
+                time_write_to_file('co2_room2_timestamp.txt', 'w')  
+                add_co2_room2(True) # Turn ON co2
+                time.sleep(5) # Hold ON for 5 secs
+                add_co2_room2(False) # Turn OFF co2
+            else:
+                if mins_since_event('co2_room2_timestamp.txt') > 5:
+                    add_co2_room2(True) # Turn ON co2
+                    time.sleep(5) # Hold ON for 5 secs
+                    add_co2_room2(False) # Turn OFF co2
+                    time_write_to_file('co2_room2_timestamp.txt', 'w')
+        else:
+            remove_timestamp('co2_room2_timestamp.txt') 
+            
+def emergency_heating_control():
+    """Function to control the heating in a intruder situation will turn off
+    lights if over 30 deg for 5mins and will not turn them on for 15mins or
+    until temp at 26 deg or lower"""
+    temp_room_1 = room1_temp()
+    temp_room_2 = room2_temp()    
+    if temp_room_1 > 30: # Turn off lights to control temp
+        if len(initial_time('emergency_temp_room1_timestamp.txt')) == 0:
+            time_write_to_file('emergency_temp_room1_timestamp.txt', 'w')
+        else:
+            if mins_since_event('emergency_temp_room1_timestamp.txt') > 5:
+                light_room1(False) # Temp been over 30 for 5mins turn off light       
+        
+    elif temp_room_2 > 30: # Turn off lights to control temp 
+        if len(initial_time('emergency_temp_room2_timestamp.txt')) == 0:
+            time_write_to_file('emergency_temp_room2_timestamp.txt', 'w')
+        else:
+            if mins_since_event('emergency_temp_room2_timestamp.txt') > 5:
+                light_room2(False) # Temp been over 30 for 5mins turn off light
+                
+    elif temp_room_1 <= 30:
+        check_lighting_state_room1()
+        remove_timestamp('emergency_temp_room1_timestamp.txt')
+        
+    elif temp_room_2 <= 30:
+        check_lighting_state_room2()
+        remove_timestamp('emergency_temp_room2_timestamp.txt')    
+        
     
 """The below code is for the main programme to run and do its thing as provided
 by the description from the GSW wooksheet"""
@@ -731,7 +953,11 @@ def main():
     time_write_to_file('time_stamp.txt', 'a')
     system_ok = True
     master_water(True) # Turn Master Water Supply ON
-    if not trip_sensor(): # Trip Sensor Intruder alert not active
+    if not trip_sensor() and (mins_since_event('intruder_timestamp.txt') > 30\
+                              or len(initial_time('intruder_timestamp.txt')) \
+                              == 0): # Trip Sensor Intruder alert not active
+                              # and more than 30 mins since alert or no alert yet
+        remove_timestamp('intruder_timestamp.txt')
         """Check Lighting State both rooms"""
         check_lighting_state_room1()
         check_lighting_state_room2()
@@ -742,34 +968,31 @@ def main():
         """Check pH levels of reservoirs"""
         check_ph_level_res(1)
         check_ph_level_res(2)
+        """Check moisture on subjects and water if required"""
+        read_moisture_subject_and_water(1)
+        read_moisture_subject_and_water(2)
+        read_moisture_subject_and_water(3)
+        read_moisture_subject_and_water(4)
+        read_moisture_subject_and_water(5)
+        read_moisture_subject_and_water(6)
+        """Check Room Temperatures and adjust fans"""
+        temperature_and_fan_control()
+        """Check humidity and mist if required"""
+        check_room_humidity()
+        """Check co2 levels and adjust if required"""
+        check_room_co2(1)
+        check_room_co2(2)
+    else: # Intruder Mode
+        if len(initial_time('intruder_timestamp.txt')) == 0:
+            time_write_to_file('intruder_timestamp.txt', 'w')
+            aux_fan(False)
+            fan_speed_toogle(False)        
+            emergency_heating_control()
+            notification_to_file('intruder_notifications.txt', 'INTRUDER ALERT!') 
+        else:
+            aux_fan(False)
+            fan_speed_toogle(False)        
+            emergency_heating_control()
+            notification_to_file('intruder_notifications.txt', 'INTRUDER ALERT!')            
 
 
-
-
-
-def main():
-    """Main Programme"""
-    system_ok = True
-    while system_ok:
-        _L3 = room1_lux()
-        _L4 = room2_lux()
-        _M1 = moisture_subject1()
-        _M2 = moisture_subject2()
-        _M3 = moisture_subject3()
-        _M4 = moisture_subject4()
-        _M5 = moisture_subject5()
-        _M6 = moisture_subject6()
-        _T1 = room1_temp()
-        _T2 = room2_temp()
-        _T3 = intake_temp()
-        _H1 = room1_humidity()
-        _H2 = room2_humidity()
-        _O1 = room1_co2()
-        _O2 = room2_co2()
-        _W1 = reservoir1_upper_level()
-        _W2 = reservoir1_lower_level()
-        _W3 = reservoir2_upper_level()
-        _W4 = reservoir2_lower_level()
-        _P1 = reservoir1_ph()
-        _P2 = reservoir2_ph()
-        _Q1 = trip_sensor()
